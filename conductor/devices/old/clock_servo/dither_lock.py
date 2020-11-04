@@ -1,9 +1,10 @@
+from __future__ import absolute_import
 import json
 from twisted.internet.defer import inlineCallbacks
 from labrad.wrappers import connectAsync
 
 from devices.conductor_device.conductor_parameter import ConductorParameter
-from lib.pid import Dither, DitherPIID
+from .lib.pid import Dither, DitherPIID
 
 class DitherLock(ConductorParameter):
     priority = 9

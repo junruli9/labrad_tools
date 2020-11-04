@@ -15,6 +15,8 @@ message = 987654321
 timeout = 20
 ### END NODE INFO
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
 import json
 import os
@@ -32,11 +34,11 @@ from twisted.internet.defer import inlineCallbacks
 from twisted.internet.defer import returnValue
 from twisted.internet.threads import deferToThread
 
-from lib.helpers import import_parameter
-from lib.helpers import remaining_points
-from lib.exceptions import ParameterAlreadyRegistered
-from lib.exceptions import ParameterNotImported
-from lib.exceptions import ParameterNotRegistered
+from .lib.helpers import import_parameter
+from .lib.helpers import remaining_points
+from .lib.exceptions import ParameterAlreadyRegistered
+from .lib.exceptions import ParameterNotImported
+from .lib.exceptions import ParameterNotRegistered
 
 # TODO remote save parameter files locally
 # TODO get available parameters
@@ -109,7 +111,7 @@ class ConductorServer(LabradServer):
                 try:
                     yield self.register_parameters(c, json.dumps(params))
                 except ParameterNotImported:
-                    print "{} not imported successfully".format(device)
+                    print("{} not imported successfully".format(device))
 
             # If the device is loaded, check that all the parameters are there
             else:
@@ -195,7 +197,7 @@ class ConductorServer(LabradServer):
                     parameter.value_type = value_type
                 self.parameters[device_name][parameter_name] = parameter
                 
-                print "{}'s {} registered".format(device_name, parameter_name)              
+                print("{}'s {} registered".format(device_name, parameter_name))              
                 yield parameter.initialize()
                 yield self.update_parameter(parameter)
 
@@ -323,16 +325,16 @@ class ConductorServer(LabradServer):
                     yield self.set_parameter_value(device_name, parameter_name, value, True)
         except:
             if use_registry:
-                print 'looking in registry for parameter {}'.format(device_name + parameter_name)
-                print 'this feature will be depreciated'
+                print('looking in registry for parameter {}'.format(device_name + parameter_name))
+                print('this feature will be depreciated')
                 try: 
                     yield self.client.registry.cd(self.registry_directory
                                                   + [device_name])
                     value = yield self.client.registry.get(parameter_name)
                     config = json.dumps({device_name: {parameter_name: value}})
                     yield self.set_parameter_values(None, config, True)
-                except Exception, e:
-                    print e
+                except Exception as e:
+                    print(e)
                     message = 'unable to get most recent value for\
                                {} {}'.format(device_name, parameter_name)
             else:
@@ -447,7 +449,7 @@ class ConductorServer(LabradServer):
                     iteration += 1
                 self.data_path = data_path(iteration)
                 
-                print 'saving data to {}'.format(self.data_path)
+                print('saving data to {}'.format(self.data_path))
                 if not os.path.exists(data_directory):
                     os.mkdir(data_directory)
 
@@ -455,7 +457,7 @@ class ConductorServer(LabradServer):
         else:
             self.data = {}
             if self.data_path:
-                print 'experiment queue is empty'
+                print('experiment queue is empty')
             # signal that experiment has stopped
             self.experiment_stopped(True)
             self.data_path = None
@@ -470,7 +472,7 @@ class ConductorServer(LabradServer):
         if not pts:
             advanced = yield self.advance_experiment()
         else:
-            print 'remaining points: ', pts
+            print('remaining points: ', pts)
 
         # sort by priority. higher priority is called first. 
         priority_parameters = [parameter for device_name, device_parameters
@@ -497,11 +499,11 @@ class ConductorServer(LabradServer):
         """ have device update parameter value """
         try:
             yield parameter.update()
-        except Exception, e:
+        except Exception as e:
             # remove parameter is update failed.
-            print e
-            print 'could not update {}\'s {}. removing parameter'.format(
-                    parameter.device_name, parameter.name)
+            print(e)
+            print('could not update {}\'s {}. removing parameter'.format(
+                    parameter.device_name, parameter.name))
             yield self.remove_parameter(parameter.device_name, parameter.name)
     
     def save_parameters(self):
@@ -596,7 +598,7 @@ class ConductorServer(LabradServer):
             if 'ID' in kwargs:
                 del self.advance_dict[str(kwargs['ID'])]
             if self.do_print_delay:
-                print 'delay', tf-ti
+                print('delay', tf-ti)
 
     @setting(16, do_print_delay='b', returns='b')
     def print_delay(self, c, do_print_delay=None):
