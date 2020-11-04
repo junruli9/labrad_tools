@@ -45,7 +45,7 @@ class Downlegexp(ConductorParameter):
             except KeyError:
                 print("Couldn't find channel \"{}\".".format(CHANNEL_NAME))
                 print("Available channels:")
-                for key in channels.keys():
+                for key in list(channels.keys()):
                     print(key)
             except Exception as e:
                 print(e)

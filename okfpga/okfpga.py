@@ -16,6 +16,7 @@ timeout = 20
 ### END NODE INFO
 """
 from __future__ import print_function
+from builtins import range
 import json
 import numpy as np
 import os
@@ -36,7 +37,7 @@ class OKFPGAServer(HardwareInterfaceServer):
     name = '%LABRADNODE%_okfpga'
 
     def refresh_available_interfaces(self):
-        for device_id, device in self.interfaces.items():
+        for device_id, device in list(self.interfaces.items()):
             try: 
                 device.GetDeviceID()
             except:

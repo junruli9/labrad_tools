@@ -1,3 +1,8 @@
+from builtins import str
+from builtins import zip
+from builtins import hex
+from builtins import range
+from builtins import object
 import json
 from twisted.internet.defer import inlineCallbacks, returnValue
 
@@ -29,7 +34,7 @@ class DigitalChannel(object):
         self.name = 'TTL'+row+str(col).zfill(2)
         
         """ non-defaults """
-        for key, value in config.items():
+        for key, value in list(config.items()):
             setattr(self, key, value)
          
         self.loc = row+str(col).zfill(2)
@@ -67,7 +72,7 @@ class DigitalBoard(DeviceWrapper):
                 for x in self.name for i in range(16)]
 
         """ non-defaults"""
-        for key, value in config.items():
+        for key, value in list(config.items()):
             setattr(self, key, value)
 
 	# added KM 08/10/2017	

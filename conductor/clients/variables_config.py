@@ -1,3 +1,5 @@
+from __future__ import division
+from past.utils import old_div
 variables_dict = [
     # Detunings and probe intensities
     ['*RbDet', 1.16],
@@ -73,11 +75,11 @@ variables_dict = [
     ['*LowerEastRod', 0.0],
     ['*UpperWestRod', 0.0],
     ['*UpperEastRod', 0.0],
-    ['*LowerPlateZero', -0.458/2.0016e3],
+    ['*LowerPlateZero', old_div(-0.458,2.0016e3)],
     ['*UpperPlateZero', 1.003/2.00172e3],
     ['*LWRodZero', 2.848/2.00192e3],
-    ['*LERodZero', -6.029/2.0014e3],
-    ['*UWRodZero', -2.496/2.00005e3],
+    ['*LERodZero', old_div(-6.029,2.0014e3)],
+    ['*UWRodZero', old_div(-2.496,2.00005e3)],
     ['*UERodZero', 0.15/2.0017e3],
     ['*LPGrad', 0],
     ['*UPGrad', 0],

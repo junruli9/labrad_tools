@@ -1,4 +1,5 @@
 from __future__ import print_function
+from builtins import object
 import sys
 from PyQt4 import QtGui, QtCore, Qt
 from PyQt4.QtCore import pyqtSignal
@@ -23,7 +24,7 @@ class AnalogVoltageManualControl(QtGui.QGroupBox):
         self.connect()
 
     def load_control_configuration(self, configuration):
-        for key, value in configuration.__dict__.items():
+        for key, value in list(configuration.__dict__.items()):
             setattr(self, key, value)
 
     @inlineCallbacks
@@ -96,7 +97,7 @@ class AnalogVoltageManualControl(QtGui.QGroupBox):
             self.free = False
             sequencer = yield self.cxn.get_server(self.servername)
             channels = yield sequencer.get_channels()
-            for k, c in json.loads(channels).items():
+            for k, c in list(json.loads(channels).items()):
                 if k.split('@')[0] == self.name:
                     update = c
             print(update)

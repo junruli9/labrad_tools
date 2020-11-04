@@ -53,12 +53,12 @@ class SequencerServer(DeviceServer):
 #            loc = None
 
         if name:
-            for d in self.devices.values():
+            for d in list(self.devices.values()):
                 for c in d.channels:
                     if c.name == name:
                         channel = c
         if not channel:
-            for d in self.devices.values():
+            for d in list(self.devices.values()):
                 for c in d.channels:
                     if c.loc == loc:
                         channel = c
@@ -71,21 +71,21 @@ class SequencerServer(DeviceServer):
     @setting(10)
     def get_channels(self, cntx):
         channels = {c.key: c.__dict__
-                for d in self.devices.values() 
+                for d in list(self.devices.values()) 
                 for c in d.channels}
         return json.dumps(channels, default=lambda x: None)
     
     @setting(11, sequence='s')
     def run_sequence(self, c, sequence):
         fixed_sequence = self._fix_sequence_keys(json.loads(sequence))
-        for device in self.devices.values():
+        for device in list(self.devices.values()):
             yield device.program_sequence(fixed_sequence)
 
-        for device in self.devices.values():
+        for device in list(self.devices.values()):
             if device.sequencer_type == 'ad5791':
                 yield device.start_sequence()
 
-        for device in self.devices.values():
+        for device in list(self.devices.values()):
             if device.sequencer_type == 'analog':
                 yield device.start_sequence()
 
@@ -98,10 +98,10 @@ class SequencerServer(DeviceServer):
 #				yield device.start_sequence()
 
          # start KRbDigi02 before KRbDigi01
-        for device in self.devices.values():
+        for device in list(self.devices.values()):
             if device.address != 'KRbDigi01' and device.sequencer_type == 'digital':
                 yield device.start_sequence()
-        for device in self.devices.values():
+        for device in list(self.devices.values()):
             if device.address == 'KRbDigi01':
                 yield device.start_sequence()
 
@@ -147,12 +147,12 @@ class SequencerServer(DeviceServer):
 #                                for dt in sequence[TRIGGER_CHANNEL]]})
 #        return sequence
         fixed_sequence = {}
-        for old_id, channel_sequence in sequence.items():
+        for old_id, channel_sequence in list(sequence.items()):
             channel = self.id2channel(old_id)
             fixed_sequence[channel.key] = channel_sequence
 
         # make sure every channel has defined sequence
-        for d in self.devices.values():
+        for d in list(self.devices.values()):
             for c in d.channels:
                 if c.key not in fixed_sequence:
                     default_sequence = [{'dt': s['dt'], 'out': c.manual_output} 

@@ -16,6 +16,7 @@ timeout = 20
 ### END NODE INFO
 """
 from __future__ import print_function
+from builtins import zip
 import sys
 
 from time import sleep
@@ -39,7 +40,7 @@ class ArduinoServer(HardwareInterfaceServer):
         descriptions = [cp[1] for cp in serial.tools.list_ports.comports()]
 
         for (address, d) in zip(addresses, descriptions):
-            if address in self.interfaces.keys():
+            if address in list(self.interfaces.keys()):
                 try:
                     self.interfaces[address].isOpen()
                 except:

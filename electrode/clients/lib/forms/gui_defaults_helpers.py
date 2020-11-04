@@ -1,3 +1,5 @@
+from __future__ import division
+from past.utils import old_div
 import json
 import time
 import numpy as np
@@ -74,13 +76,13 @@ MONITOR_FIELDS = {
 
 def DACsToVs(DACs):
 	Vs = {}
-	for key, val in DACs.items():
+	for key, val in list(DACs.items()):
 		Vs[key] = float(val)*EFC[key]['m'] + EFC[key]['b']
 	return Vs
 
 def VsToDACs(Vs):
 	DACs = {}
-	for key, val in Vs.items():
+	for key, val in list(Vs.items()):
 		DACs[key] = float(val - EFC[key]['b']) / EFC[key]['m']
 	return DACs
 
@@ -90,7 +92,7 @@ def NormalModesToVs(NormalModes):
 
 	LPNoOffset = PlateSpan/2.0
 	
-	dEdx = NormalModes['HGrad'] + NormalModes['CompShim'] * NormalModes['Bias'] / NORMALIZATION_FIELD
+	dEdx = NormalModes['HGrad'] + old_div(NormalModes['CompShim'] * NormalModes['Bias'], NORMALIZATION_FIELD)
 	ew = NormalModes['EastWest']
 	
 	Vs['LP'] = LPNoOffset + NormalModes['GlobalOffset']
@@ -144,7 +146,7 @@ def VsToNormalModes(Vs, comp_shim):
 	NormalModes['RodScale'] = RS
 
 	# Subtract scaled comp_shim
-	dEdx -= comp_shim * (NormalModes['Bias'] / NORMALIZATION_FIELD)
+	dEdx -= comp_shim * (old_div(NormalModes['Bias'], NORMALIZATION_FIELD))
 	NormalModes['CompShim'] = comp_shim
 	NormalModes['HGrad'] = dEdx
 

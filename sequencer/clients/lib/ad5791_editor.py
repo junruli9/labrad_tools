@@ -1,4 +1,8 @@
 from __future__ import absolute_import
+from builtins import zip
+from builtins import str
+from builtins import range
+from builtins import object
 import sys
 import json
 from PyQt4 import QtGui, QtCore
@@ -79,11 +83,11 @@ class RampColumn(QtGui.QGroupBox):
         self.add = QtGui.QPushButton('+')
         self.dlt = QtGui.QPushButton('-')
         self.ramp_select = QtGui.QComboBox()
-        self.ramp_select.addItems(self.ramp_maker.available_ramps.keys())
+        self.ramp_select.addItems(list(self.ramp_maker.available_ramps.keys()))
         self.parameter_widgets = {k: ParameterWidget(k, ramp) for 
-                k, ramp in self.ramp_maker.available_ramps.items()}
+                k, ramp in list(self.ramp_maker.available_ramps.items())}
         self.stack = QtGui.QStackedWidget()
-        for k, pw in self.parameter_widgets.items():
+        for k, pw in list(self.parameter_widgets.items()):
             self.stack.addWidget(pw)
         
         self.zero_button = QtGui.QPushButton('zero')
@@ -134,7 +138,7 @@ class RampColumn(QtGui.QGroupBox):
         ramp_type = str(self.ramp_select.currentText())
         ramp = {'type': str(self.ramp_select.currentText())}
         if ramp['type'] != 'sub':
-            ramp.update({k: b.value() for k, b in self.stack.currentWidget().pboxes.items()})
+            ramp.update({k: b.value() for k, b in list(self.stack.currentWidget().pboxes.items())})
         else:
             ramp.update({'seq': eval('['+str(self.stack.currentWidget().subbox.toPlainText())+']')})
         return ramp
@@ -237,8 +241,8 @@ class AD5791VoltageEditor(QtGui.QDialog):
         # pyqt signals
         for c in self.ramp_table.cols:
             c.ramp_select.currentIndexChanged.connect(self.replot)
-            for pw in c.parameter_widgets.values():
-                for pb in pw.pboxes.values():
+            for pw in list(c.parameter_widgets.values()):
+                for pb in list(pw.pboxes.values()):
                     pb.returnPressed.connect(self.replot)
         
         for i, c in enumerate(self.ramp_table.cols):
@@ -278,7 +282,7 @@ class AD5791VoltageEditor(QtGui.QDialog):
             ramp_type = s['type']
             c.show()
             c.ramp_select.setCurrentIndex(c.ramp_select.findText(ramp_type))
-	    for k in c.parameter_widgets[ramp_type].pboxes.keys():
+	    for k in list(c.parameter_widgets[ramp_type].pboxes.keys()):
                 c.parameter_widgets[ramp_type].pboxes[k].display(s[k])
                 
         self.loading = False
@@ -287,7 +291,7 @@ class AD5791VoltageEditor(QtGui.QDialog):
     def add_column(self, i):
         def ac():
             sequence = self.get_sequence()
-	    for c in sequence.keys():
+	    for c in list(sequence.keys()):
                 sequence[c].insert(i, sequence[c][i])
 
             scroll_position = self.ramp_scroll.horizontalScrollBar().value()
@@ -298,7 +302,7 @@ class AD5791VoltageEditor(QtGui.QDialog):
     def dlt_column(self, i):
         def dc():
             sequence = self.get_sequence()
-	    for c in sequence.keys():
+	    for c in list(sequence.keys()):
                 sequence[c].pop(i)
 
             scroll_position = self.ramp_scroll.horizontalScrollBar().value()

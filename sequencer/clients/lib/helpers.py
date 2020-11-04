@@ -1,3 +1,4 @@
+from builtins import object
 from itertools import chain
 
 class ConfigWrapper(object):
@@ -17,7 +18,7 @@ def get_sequence_parameters(x):
     elif type(x).__name__ == 'list':
         return list(chain.from_iterable([get_sequence_parameters(xx) for xx in x]))
     elif type(x).__name__ == 'dict':
-        return list(chain.from_iterable([get_sequence_parameters(v) for v in x.values()]))
+        return list(chain.from_iterable([get_sequence_parameters(v) for v in list(x.values())]))
     else:
         return []
 
@@ -30,6 +31,6 @@ def substitute_sequence_parameters(x, parameter_values):
     elif type(x).__name__ == 'list':
         return [substitute_sequence_parameters(xx, parameter_values) for xx in x]
     elif type(x).__name__ == 'dict':
-        return {k: substitute_sequence_parameters(v, parameter_values) for k, v in x.items()}
+        return {k: substitute_sequence_parameters(v, parameter_values) for k, v in list(x.items())}
     else:
         return x

@@ -1,3 +1,4 @@
+from builtins import str
 import sys
 sys.path.append('../')
 from generic_device.generic_parameter import GenericParameter

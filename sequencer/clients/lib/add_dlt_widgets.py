@@ -1,3 +1,4 @@
+from builtins import range
 from PyQt4 import QtGui
 
 class AddDltButton(QtGui.QWidget):

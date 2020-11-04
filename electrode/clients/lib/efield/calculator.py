@@ -1,4 +1,8 @@
 from __future__ import absolute_import
+from __future__ import division
+from builtins import zip
+from builtins import object
+from past.utils import old_div
 import json
 import time
 import numpy as np
@@ -97,7 +101,7 @@ class ECalculator(object):
 
 	def _parametersDump(self, ea):
 		params = {}
-		for k, v in self.getParameterFunctionTable().items():
+		for k, v in list(self.getParameterFunctionTable().items()):
 			params[k] = v(ea)
 		return params
 
@@ -151,7 +155,7 @@ class ECalculator(object):
 			if self._E(ea)(x,y).any() == 0:
 				return 0
 			else:
-				return (Ex(x,y)*dExdx(x,y) + Ey(x,y)*dEydx(x,y))/self._E(ea)(x,y)
+				return old_div((Ex(x,y)*dExdx(x,y) + Ey(x,y)*dEydx(x,y)),self._E(ea)(x,y))
 		return fdEdx
 
 	def _dEdy(self, ea):
@@ -164,7 +168,7 @@ class ECalculator(object):
 			if self._E(ea)(x,y).any() == 0:
 				return 0
 			else:
-				return (Ex(x,y)*dExdy(x,y) + Ey(x,y)*dEydy(x,y))/self._E(ea)(x,y)
+				return old_div((Ex(x,y)*dExdy(x,y) + Ey(x,y)*dEydy(x,y)),self._E(ea)(x,y))
 		return fdEdy
 
 	# Taylor expand around (0,0)
@@ -182,7 +186,7 @@ class ECalculator(object):
 		if self._E(ea)(0,0).any() == 0:
 			return 0
 		else:
-			return (first + second) / self._E(ea)(0,0)
+			return old_div((first + second), self._E(ea)(0,0))
 	
 	# Taylor expand around (0,0)
 	def _yQuadraticCoeff(self, ea):
@@ -199,7 +203,7 @@ class ECalculator(object):
 		if self._E(ea)(0,0).any() == 0:
 			return 0
 		else:
-			return (first + second) / self._E(ea)(0,0)
+			return old_div((first + second), self._E(ea)(0,0))
 
 	############################################
 	############################################
@@ -209,7 +213,7 @@ class ECalculator(object):
 	############################################
 	def _U(self, ea):
 		def fU(x,y):
-			return -self.dipole(self._E(ea)(x,y)) * self._E(ea)(x,y) * DVcmToJ * 1e6 / kB
+			return old_div(-self.dipole(self._E(ea)(x,y)) * self._E(ea)(x,y) * DVcmToJ * 1e6, kB)
 		return fU
 
 	def _dUdx(self, ea):
@@ -309,19 +313,19 @@ class ECalculator(object):
 
 	def Fx(self, ea):
 		# nK/micron
-		return float(-self._dUdx(ea) / kB * 1e9 * 1e-6)
+		return float(old_div(-self._dUdx(ea), kB) * 1e9 * 1e-6)
 
 	def Fy(self, ea):
 		# nK/micron
-		return float(-self._dUdy(ea) / kB * 1e9 * 1e-6)
+		return float(old_div(-self._dUdy(ea), kB) * 1e9 * 1e-6)
 
 	def nux(self, ea):
 		cx = self._xQuadCoeffU(ea)
-		return float(np.sign(cx) * np.sqrt(np.abs(cx) / (127.0*amu) / (2*np.pi)))
+		return float(np.sign(cx) * np.sqrt(old_div(old_div(np.abs(cx), (127.0*amu)), (2*np.pi))))
 
 	def nuy(self, ea):
 		cy = self._yQuadCoeffU(ea)
-		return float(np.sign(cy) * np.sqrt(np.abs(cy) / (127.0*amu)/ (2*np.pi)))
+		return float(np.sign(cy) * np.sqrt(old_div(old_div(np.abs(cy), (127.0*amu)), (2*np.pi))))
 
 
 class Potential(object):

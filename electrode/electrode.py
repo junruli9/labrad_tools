@@ -17,6 +17,7 @@ timeout = 20
 """
 from __future__ import print_function
 from __future__ import absolute_import
+from builtins import str
 import json
 import numpy as np
 import sys
@@ -61,7 +62,7 @@ class ElectrodeServer(LabradServer):
 			self.config_path = path
 		with open(self.config_path, 'r') as infile:
 			config = json.load(infile)
-			for key, value in config.items():
+			for key, value in list(config.items()):
 				setattr(self, key, value)
 
 	@setting(1, returns='s')
@@ -106,7 +107,7 @@ class ElectrodeServer(LabradServer):
 		
 		temp = deepcopy(self.lookup)
 		
-		for k, v in d.items():
+		for k, v in list(d.items()):
 			if k in self.lookup:
 				if v != self.lookup[k]:
 					self.lookup[k] = v

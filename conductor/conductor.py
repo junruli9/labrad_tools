@@ -18,6 +18,7 @@ timeout = 20
 from __future__ import print_function
 from __future__ import absolute_import
 
+from builtins import str
 import json
 import os
 
@@ -82,7 +83,7 @@ class ConductorServer(LabradServer):
             self.config_path = path
         with open(self.config_path, 'r') as infile:
             config = json.load(infile)
-            for key, value in config.items():
+            for key, value in list(config.items()):
                 setattr(self, key, value)
 
     def initServer(self):
@@ -147,8 +148,8 @@ class ConductorServer(LabradServer):
         Returns:
             bool. true if no errors.
         """
-        for device_name, device_parameters in json.loads(parameters).items():
-            for parameter_name, parameter_config in device_parameters.items():
+        for device_name, device_parameters in list(json.loads(parameters).items()):
+            for parameter_name, parameter_config in list(device_parameters.items()):
                 yield self.register_parameter(device_name, parameter_name, 
                         parameter_config, generic_parameter, value_type)
 
@@ -214,8 +215,8 @@ class ConductorServer(LabradServer):
                     }
                 }
         """
-        for device_name, device_parameters in json.loads(parameters).items():
-            for parameter_name, _ in device_parameters.items():
+        for device_name, device_parameters in list(json.loads(parameters).items()):
+            for parameter_name, _ in list(device_parameters.items()):
                 yield self.remove_parameter(device_name, parameter_name)
         returnValue(True)
     
@@ -253,8 +254,8 @@ class ConductorServer(LabradServer):
             }
         }
         """
-        for device_name, device_parameters in json.loads(parameters).items():
-            for parameter_name, parameter_value in device_parameters.items():
+        for device_name, device_parameters in list(json.loads(parameters).items()):
+            for parameter_name, parameter_value in list(device_parameters.items()):
                 yield self.set_parameter_value(device_name, parameter_name, 
                                                parameter_value, 
                                                generic_parameter, value_type)
@@ -296,12 +297,12 @@ class ConductorServer(LabradServer):
         }
         """
         if parameters is None:
-            parameters = {dn: dp.keys() for dn, dp in self.parameters.items()}
+            parameters = {dn: list(dp.keys()) for dn, dp in list(self.parameters.items())}
         else:
             parameters = json.loads(parameters)
 
         parameter_values = {}
-        for device_name, device_parameters in parameters.items():
+        for device_name, device_parameters in list(parameters.items()):
             parameter_values[device_name] = {}
             for parameter_name in device_parameters:
                 parameter_values[device_name][parameter_name] = \
@@ -382,8 +383,8 @@ class ConductorServer(LabradServer):
 #        return True
 
         # replace parameter value lists with single value.
-        for device_name, device_parameters in self.parameters.items():
-            for parameter_name, parameter in device_parameters.items():
+        for device_name, device_parameters in list(self.parameters.items()):
+            for parameter_name, parameter in list(device_parameters.items()):
                 parameter.value = parameter.value
                 if parameter_name == 'sequence':
                     parameter.value = [parameter.default_sequence]
@@ -399,15 +400,15 @@ class ConductorServer(LabradServer):
     # Abort the experiment immediately, then run defaults
     @setting(17)
     def abort_experiment(self, c):
-        for ID, call in self.advance_dict.items():
+        for ID, call in list(self.advance_dict.items()):
             try:
                 call.cancel()
             except:
                 pass
         self.advance_dict = {}
         self.stop_experiment(c)
-        for device_name, device_parameters in self.parameters.items():
-            for parameter_name, parameter in device_parameters.items():
+        for device_name, device_parameters in list(self.parameters.items()):
+            for parameter_name, parameter in list(device_parameters.items()):
                 self.update_parameter(parameter)
  
     @setting(13, returns='s')
@@ -476,9 +477,9 @@ class ConductorServer(LabradServer):
 
         # sort by priority. higher priority is called first. 
         priority_parameters = [parameter for device_name, device_parameters
-                                         in self.parameters.items()
+                                         in list(self.parameters.items())
                                          for parameter_name, parameter 
-                                         in device_parameters.items()
+                                         in list(device_parameters.items())
                                          if parameter.priority]
 
         # advance parameter values if parameter has priority
@@ -509,15 +510,15 @@ class ConductorServer(LabradServer):
     def save_parameters(self):
         # save data to disk
         if self.data:
-            data_length = max([len(p) for dp in self.data.values()
-                                      for p in dp.values()])
+            data_length = max([len(p) for dp in list(self.data.values())
+                                      for p in list(dp.values())])
         else:
             data_length = 0
         
-        for device_name, device_parameters in self.parameters.items():
+        for device_name, device_parameters in list(self.parameters.items()):
             if not self.data.get(device_name):
                 self.data[device_name] = {}
-            for parameter_name, parameter in device_parameters.items():
+            for parameter_name, parameter in list(device_parameters.items()):
                 if not self.data[device_name].get(parameter_name):
                     self.data[device_name][parameter_name] = []
                 parameter_data = self.data[device_name][parameter_name] 
@@ -539,10 +540,10 @@ class ConductorServer(LabradServer):
         else:
             old_parameters = {}
         parameters = deepcopy(old_parameters)
-        for device_name, device_parameters in self.parameters.items():
+        for device_name, device_parameters in list(self.parameters.items()):
             if not parameters.get(device_name):
                 parameters[device_name] = {}
-            for parameter_name, parameter in device_parameters.items():
+            for parameter_name, parameter in list(device_parameters.items()):
                 parameters[device_name][parameter_name] = parameter.value
         
         parameters_filename = self.parameters_directory + 'current_parameters.json'
@@ -588,7 +589,7 @@ class ConductorServer(LabradServer):
         if delay:
             self.advance_dict[str(self.advance_counter)] = callLater(delay, self.advance, c, ID=self.advance_counter)
             self.advance_counter=0
-            while str(self.advance_counter) in self.advance_dict.keys():
+            while str(self.advance_counter) in list(self.advance_dict.keys()):
                 self.advance_counter += 1 
         else:
             ti = time()

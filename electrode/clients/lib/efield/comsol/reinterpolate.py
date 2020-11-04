@@ -7,6 +7,7 @@ from __future__ import print_function
 # on the office computer.
 ###########################################################################
 
+from builtins import zip
 import json
 import time
 import numpy as np

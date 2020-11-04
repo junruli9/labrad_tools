@@ -1,4 +1,8 @@
 from __future__ import absolute_import
+from __future__ import division
+from builtins import str
+from builtins import range
+from past.utils import old_div
 import json
 import time
 import numpy as np
@@ -52,7 +56,7 @@ class OutputForms(QtGui.QGroupBox):
 		PlateSpan = vs['LP'] - vs['UP']
 		bias = float(PlateSpan) / PLATE_SEPARATION * RODS_CORRECTION
 
-		dEdx = comp_shim * bias / NORMALIZATION_FIELD
+		dEdx = old_div(comp_shim * bias, NORMALIZATION_FIELD)
 
 		vs['LW'] -= (-1.0)*dEdx
 		vs['LE'] += (-1.0)*dEdx
@@ -97,7 +101,7 @@ class MonitorForm(QtGui.QGroupBox):
 
 	def getValues(self):
 		self.values = {}
-		for key,val in self.lookup.items():
+		for key,val in list(self.lookup.items()):
 			self.values[key] = float(self.edits[i].text())
 		vals = deepcopy(self.values)
 		return vals
@@ -115,7 +119,7 @@ class ChannelMonitor(MonitorForm):
 	def convertAndPopulate(self, Vs):
 		DACVs = VsToDACs(Vs)
 
-		for key, val in DACVs.items():
+		for key, val in list(DACVs.items()):
 			index = self.lookup[key]
 			precision = self.config['precisions'][index]
 			self.edits[index].setText("{0:+0.{precision}f}".format(val, precision=precision))
@@ -137,7 +141,7 @@ class ParameterMonitor(MonitorForm):
 	def convertAndPopulate(self, Vs):
 		v = self.calculator.parametersDump(Vs)
 
-		for key, val in v.items():
+		for key, val in list(v.items()):
 			index = self.lookup[key]
 			precision = self.config['precisions'][index]
 			self.edits[index].setText("{0:+0.{precision}f}".format(val, precision=precision))

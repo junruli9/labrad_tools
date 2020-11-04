@@ -1,3 +1,4 @@
+from builtins import object
 from collections import deque
 import numpy as np
 
@@ -26,7 +27,7 @@ class DitherIII(object):
         self.set_parameters(**kwargs)
 
     def set_parameters(self, **kwargs):
-        for k, v in kwargs.items():
+        for k, v in list(kwargs.items()):
             setattr(self, k, v)
         
         G = self.overall_gain
@@ -47,7 +48,7 @@ class DitherIII(object):
 
     def tick(self, side, value):
         self.input_buffer[side].append(value)
-        if np.product([bool(v) for v in self.input_buffer.values()]):
+        if np.product([bool(v) for v in list(self.input_buffer.values())]):
             self.update_output()
         return self.output
 
@@ -116,7 +117,7 @@ class DitherPID(object):
         self.set_parameters(**kwargs)
 
     def set_parameters(self, **kwargs):
-        for k, v in kwargs.items():
+        for k, v in list(kwargs.items()):
             setattr(self, k, v)
         
         G = self.overall_gain
@@ -135,7 +136,7 @@ class DitherPID(object):
 
     def tick(self, side, value):
         self.input_buffer[side].append(value)
-        if np.product([bool(v) for v in self.input_buffer.values()]):
+        if np.product([bool(v) for v in list(self.input_buffer.values())]):
             self.update_output()
         return self.output
 
@@ -208,7 +209,7 @@ class DitherPIID(object):
         self.set_parameters(**kwargs)
 
     def set_parameters(self, **kwargs):
-        for k, v in kwargs.items():
+        for k, v in list(kwargs.items()):
             setattr(self, k, v)
         
         G = self.overall_gain
@@ -231,7 +232,7 @@ class DitherPIID(object):
 
     def tick(self, side, value):
         self.input_buffer[side].append(value)
-        if np.product([bool(v) for v in self.input_buffer.values()]):
+        if np.product([bool(v) for v in list(self.input_buffer.values())]):
             self.update_output()
         return self.output
 
@@ -296,7 +297,7 @@ class Dither(object):
         self.set_parameters(**kwargs)
 
     def set_parameters(self, **kwargs):
-        for k, v in kwargs.items():
+        for k, v in list(kwargs.items()):
             setattr(self, k, v)
 
     def tick(self, side, center):

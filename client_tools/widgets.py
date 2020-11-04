@@ -1,5 +1,9 @@
 from __future__ import print_function
 from __future__ import absolute_import
+from __future__ import division
+from builtins import str
+from builtins import zip
+from past.utils import old_div
 from PyQt4 import QtGui, QtCore, Qt
 import numpy as np
 
@@ -77,7 +81,7 @@ class SuperSpinBox(QtGui.QLineEdit):
 
         value = sorted([self.display_range[0], value, self.display_range[1]])[1] # force value to be within [min, max]
         self.display_factor, self.unit = self.format_number(value)        
-        self.setText(str('{:0.'+str(self.num_decimals)+'f}' + ' {}'.format(self.unit)).format(value/self.display_factor))
+        self.setText(str('{:0.'+str(self.num_decimals)+'f}' + ' {}'.format(self.unit)).format(old_div(value,self.display_factor)))
         # place cursor in previous place 
         decimal_position = len(self.text().split('.')[0]) +1
         cursor_position = decimal_position - rel_position
@@ -92,7 +96,7 @@ class SuperSpinBox(QtGui.QLineEdit):
                 return np.log10(abs(x))
             else: 
                 return float(2**64-1)
-        factor = min(zip(*self.units)[0], key=lambda x: abs(x-np.floor(log10(value))+1))
+        factor = min(list(zip(*self.units))[0], key=lambda x: abs(x-np.floor(log10(value))+1))
         for x, y in self.units:
             if x == factor:
                 return 10.**x, y

@@ -1,3 +1,6 @@
+from __future__ import division
+from builtins import str
+from past.utils import old_div
 import json
 import time
 import numpy as np
@@ -90,7 +93,7 @@ class ElectrodeControl(QtGui.QWidget):
 		self.displays = DisplayWidget(self.calculator)
 
 		self.optimizeButton.clicked.connect(self.optimize)
-		self.optimizeButton.setFixedWidth(WIDGET_GEOMETRY['w']/4)
+		self.optimizeButton.setFixedWidth(old_div(WIDGET_GEOMETRY['w'],4))
 
 		self.forms.inputForms.crossUpdated.connect(self.inputFormChanged)
 		self.settings.updateDescriptionSignal.connect(self.descriptionChanged)

@@ -46,5 +46,5 @@ def remaining_points(parameters):
         int
     """
     return max([parameter.remaining_values() 
-        for device_parameters in parameters.values()
-        for parameter in device_parameters.values()])
+        for device_parameters in list(parameters.values())
+        for parameter in list(device_parameters.values())])

@@ -1,4 +1,7 @@
 from __future__ import print_function
+from __future__ import division
+from builtins import zip
+from past.utils import old_div
 import json
 import time
 import numpy as np
@@ -82,7 +85,7 @@ class OptimizationDialog(QtGui.QDialog):
 
 		PlateSpan = vs['LP'] - vs['UP']
 		bias = float(PlateSpan) / PLATE_SEPARATION * RODS_CORRECTION
-		dEdx = comp_shim * bias / NORMALIZATION_FIELD
+		dEdx = old_div(comp_shim * bias, NORMALIZATION_FIELD)
 
 		vs['LW'] -= (-1.0)*dEdx
 		vs['LE'] += (-1.0)*dEdx
@@ -110,7 +113,7 @@ class OptimizationDialog(QtGui.QDialog):
 		table = self.calculator.getParameterFunctionTable()
 
 		ks = []
-		for k, v in checks.items():
+		for k, v in list(checks.items()):
 			if v:
 				ks.append(k)
 
@@ -243,13 +246,13 @@ class OptimizationInputForm(QtGui.QWidget):
 	def getValues(self):
 		values = {}
 
-		for k,v in self.lookup.items():
+		for k,v in list(self.lookup.items()):
 			values[k] = self.widgets[v][-1].value()
 
 		return values
 
 	def setValues(self, values):
-		for k, v in values.items():
+		for k, v in list(values.items()):
 			if k in self.lookup:
 				self.widgets[self.lookup[k]][-1].setValue(float(v))
 
@@ -283,7 +286,7 @@ class OptimizationResultsForm(QtGui.QWidget):
 		self.setLayout(self.layout)
 
 	def setValues(self, values):
-		for k, v in values.items():
+		for k, v in list(values.items()):
 			if k in self.lookup:
 				index = self.lookup[k]
 				precision = self.config['precisions'][index]
@@ -304,7 +307,7 @@ class ParameterInputForm(OptimizationInputForm):
 	
 	def getChecks(self):
 		checks = {}
-		for k, v in self.lookup.items():
+		for k, v in list(self.lookup.items()):
 			checks[k] = self.widgets[v][0].isChecked()
 		return checks
 
@@ -372,7 +375,7 @@ class SymmetriesForm(QtGui.QWidget):
 	
 	def getChecks(self):
 		checks = {}
-		for k,v in self.lookup.items():
+		for k,v in list(self.lookup.items()):
 			checks[k] = self.widgets[v].isChecked()
 		return checks
 

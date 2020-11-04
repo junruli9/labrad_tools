@@ -1,5 +1,10 @@
 from __future__ import print_function
 from __future__ import absolute_import
+from __future__ import division
+from builtins import str
+from builtins import range
+from builtins import object
+from past.utils import old_div
 import numpy as np
 import json
 import math
@@ -18,7 +23,7 @@ FPGA_CLOCK = 4e6
 N_CHANNELS = 6
 
 RAM_DEPTH = 10
-MAX_STEPS = (2**RAM_DEPTH - 1) / 3 - 1
+MAX_STEPS = old_div((2**RAM_DEPTH - 1), 3) - 1
 
 MIN_TICKS_TO_OUTPUT = 31 # Number of clock cycles to output 1 value
 # Let's pad this a bit to be safe
@@ -41,14 +46,14 @@ def calcD(v):
         v = VMIN
 
     if v >= VREFP:
-        v = VREFP - (VREFP - VREFN) / CONV_FACTOR
+        v = VREFP - old_div((VREFP - VREFN), CONV_FACTOR)
     elif v < VREFN:
         v = VREFN
 
     if v >= 0:
-        return long(CONV_FACTOR * v / (VREFP - VREFN))
+        return int(old_div(CONV_FACTOR * v, (VREFP - VREFN)))
     else:
-        return long(CONV_FACTOR * (VREFP - VREFN + v) / (VREFP - VREFN) + 1)
+        return int(old_div(CONV_FACTOR * (VREFP - VREFN + v), (VREFP - VREFN)) + 1)
 
 
 class AD5791Channel(object):
@@ -71,7 +76,7 @@ class AD5791Channel(object):
         self.voltage_range = [-10., 10.]
         
         """ non-defaults """
-        for key, value in config.items():
+        for key, value in list(config.items()):
             setattr(self, key, value)
         
         self.index = self.loc 
@@ -101,7 +106,7 @@ class AD5791Board(DeviceWrapper):
                             for i in range(N_CHANNELS)]
 
         """ non-defaults"""
-        for key, value in config.items():
+        for key, value in list(config.items()):
             setattr(self, key, value)
         
         for c in self.channels:
@@ -215,7 +220,7 @@ class AD5791Board(DeviceWrapper):
             final_ramps = []
             for r in consolidated_ramps:
                 if r['dt'] > MAX_TIME:
-                    n_steps = math.ceil(r['dt'] / MAX_TIME)
+                    n_steps = math.ceil(old_div(r['dt'], MAX_TIME))
                     dt = float(r['dt']) / n_steps
                     for i in range(n_steps):
                         v = last_v + (r['v'] - last_v) * float(i+1) / n_steps

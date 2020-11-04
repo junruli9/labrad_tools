@@ -1,6 +1,7 @@
 """ Moves all of the current sequences to today's date """ 
 from __future__ import print_function
 
+from builtins import range
 import glob, datetime
 import os
 from shutil import copyfile

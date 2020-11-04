@@ -1,4 +1,7 @@
 from __future__ import absolute_import
+from __future__ import division
+from builtins import range
+from past.utils import old_div
 import json
 import numpy as np
 import sys
@@ -91,7 +94,7 @@ class ElectrodeArray(FigureCanvas):
         self.draw()
 
     def on_move(self, event):
-        col = int(event.xdata / 99)
+        col = int(old_div(event.xdata, 99))
         if self.mouseover_col != col:
             self.mouseover_col = col
             self.mouseover.emit(self.mouseover_col)

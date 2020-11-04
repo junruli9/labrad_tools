@@ -1,5 +1,8 @@
 from __future__ import print_function
 from __future__ import absolute_import
+from builtins import str
+from builtins import range
+from builtins import object
 import json
 import numpy as np
 import sys
@@ -22,7 +25,7 @@ class ParameterRow(QtGui.QWidget):
         self.populateGUI()
 
     def loadControlConfiguration(self, configuration):
-        for key, value in configuration.__dict__.items():
+        for key, value in list(configuration.__dict__.items()):
             setattr(self, key, value)
     
     def populateGUI(self):
@@ -54,7 +57,7 @@ class ParameterControl(QtGui.QGroupBox):
 
     def loadControlConfiguration(self, configuration):
         self.configuration = configuration
-        for key, value in configuration.__dict__.items():
+        for key, value in list(configuration.__dict__.items()):
             setattr(self, key, value)
 
     @inlineCallbacks
@@ -144,7 +147,7 @@ class ParameterControl(QtGui.QGroupBox):
             parameters = json.loads(parameters_json)[self.device]
             for pr in self.parameterRows:
                 parameterName = str(pr.nameBox.text())
-                if parameterName in parameters.keys():
+                if parameterName in list(parameters.keys()):
                     pr.valueBox.display(parameters[parameterName])
 
     def writeValue(self, parameterRow):

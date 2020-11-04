@@ -1,3 +1,5 @@
+from __future__ import division
+from past.utils import old_div
 import json
 import time
 import numpy as np
@@ -46,7 +48,7 @@ class DisplayWidget(QtGui.QWidget):
 		PlateSpan = vs['LP'] - vs['UP']
 		bias = float(PlateSpan) / PLATE_SEPARATION * RODS_CORRECTION
 
-		dEdx = comp_shim * bias / NORMALIZATION_FIELD
+		dEdx = old_div(comp_shim * bias, NORMALIZATION_FIELD)
 
 		vs['LW'] -= (-1.0)*dEdx
 		vs['LE'] += (-1.0)*dEdx

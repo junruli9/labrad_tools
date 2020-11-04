@@ -1,8 +1,12 @@
+from __future__ import division
+from builtins import range
+from builtins import object
+from past.utils import old_div
 import json
 import numpy as np
 import matplotlib.pyplot as plt
  
-class evaporation():
+class evaporation(object):
  
     def __init__(self, trajpath = "./evap.json"):
         self.dt = 0.1 #Update freq with timestep [s]
@@ -15,7 +19,7 @@ class evaporation():
                 evap = json.load(infile)
  
             n = []
-            for key, value in evap.items():
+            for key, value in list(evap.items()):
 	    	setattr(self, key, value)
 		if not  key == 'timestamp':
 	        	n.append(len(value))
@@ -43,15 +47,15 @@ class evaporation():
             raise Exception("Initial and final frequencies must be larger than asymptotic frequency")
          
         if fi > fs:
-            tf = tau*np.log((float(fi)-fa)/(fs-fa))
-            N = int(np.floor(tf/self.dt))
+            tf = tau*np.log(old_div((float(fi)-fa),(fs-fa)))
+            N = int(np.floor(old_div(tf,self.dt)))
  
              
             Y = np.zeros(N)
             T = np.zeros(N)
             for k in range(int(N)):
                 T[k] = k*self.dt
-                Y[k] = (fi-fa)*np.exp(-T[k]/tau) + fa
+                Y[k] = (fi-fa)*np.exp(old_div(-T[k],tau)) + fa
             return Y
  
  

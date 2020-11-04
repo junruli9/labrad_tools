@@ -8,7 +8,7 @@ try:
 except:
     print('Please start LabRAD Manager')
 
-for node in node_dict.keys():
+for node in list(node_dict.keys()):
     if not node in cxn.servers:
         '{} is not running'.format(node)
     else:

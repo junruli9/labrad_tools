@@ -1,5 +1,7 @@
 from __future__ import print_function
 from __future__ import absolute_import
+from builtins import str
+from builtins import object
 import re
 import json
 import types
@@ -31,7 +33,7 @@ def get_device_wrapper(device_config):
     if os.path.isdir(_device_type):
         module_path += _device_type
     module = __import__(module_path, fromlist=[device_type])
-    print(module.__dict__.keys())
+    print(list(module.__dict__.keys()))
     return getattr(module, device_type)
 
 def get_connection_wrapper(device):
@@ -41,7 +43,7 @@ def get_connection_wrapper(device):
 
 class DeviceWrapper(object):
     def __init__(self, config={}):
-        for key, value in config.items():
+        for key, value in list(config.items()):
             setattr(self, key, value)
         self.connection_name = self.servername + ' - ' + self.address
 
@@ -67,12 +69,12 @@ class DeviceServer(LabradServer):
             self.config_path = path
         with open(self.config_path, 'r') as infile:
             config = json.load(infile)
-            for key, value in config.items():
+            for key, value in list(config.items()):
                 setattr(self.config, key, value)
 
     @inlineCallbacks
     def initServer(self):
-        for name, config in self.config.devices.items():
+        for name, config in list(self.config.devices.items()):
             yield self.initialize_device(name, config)
 
     @inlineCallbacks 
@@ -107,11 +109,11 @@ class DeviceServer(LabradServer):
 
     @setting(0, returns='*s')
     def get_device_list(self, c):
-        return self.devices.keys()
+        return list(self.devices.keys())
     
     @setting(1, name='s', returns=['s', ''])
     def select_device(self, c, name):
-        if name not in self.devices.keys():
+        if name not in list(self.devices.keys()):
             try: 
                 yield self.reload_config(c, name)
             except:

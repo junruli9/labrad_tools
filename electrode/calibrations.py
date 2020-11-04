@@ -1,4 +1,6 @@
+from __future__ import division
 # E Field Calibration
+from past.utils import old_div
 EFC = {
 	'LP' : {'m' : -2001.16, 'b': -0.336},
 	'UP' : {'m' : -2001.09, 'b': -0.309},
@@ -8,7 +10,7 @@ EFC = {
 	'UE' : {'m' : -2001.07, 'b': -0.323}
 }
 
-ZEROS = {x : -EFC[x]['b']/EFC[x]['m'] for x in EFC.keys()}
+ZEROS = {x : old_div(-EFC[x]['b'],EFC[x]['m']) for x in list(EFC.keys())}
 
 # Plate separation used to calculate E field
 PLATE_SEPARATION = 0.6 # cm

@@ -1,5 +1,8 @@
 from __future__ import print_function
 from __future__ import absolute_import
+from builtins import zip
+from builtins import str
+from builtins import range
 import json
 import time
 import numpy as np
@@ -77,7 +80,7 @@ class SequencerControl(QtGui.QWidget):
         with open(self.config_path, 'r') as infile:
             config = json.load(infile)
             self.config = ConfigWrapper(**config)
-            for key, value in config.items():
+            for key, value in list(config.items()):
                 setattr(self, key, value)
 
     @inlineCallbacks
@@ -101,11 +104,11 @@ class SequencerControl(QtGui.QWidget):
         channels = yield sequencer.get_channels()
         self.channels = json.loads(channels)
         
-        self.analog_channels = {k: c for k, c in self.channels.items() 
+        self.analog_channels = {k: c for k, c in list(self.channels.items()) 
                                      if c['channel_type'] == 'analog'}
-        self.digital_channels = {k: c for k, c in self.channels.items() 
+        self.digital_channels = {k: c for k, c in list(self.channels.items()) 
                                      if c['channel_type'] == 'digital'}
-        self.electrode_channels = {k: c for k, c in self.channels.items()
+        self.electrode_channels = {k: c for k, c in list(self.channels.items())
                                      if c['channel_type'] == 'ad5791'}
 
 
@@ -209,7 +212,7 @@ class SequencerControl(QtGui.QWidget):
         self.northeast.setFixedSize(20, self.durationrow_height)
         
         for c in self.digitalControl.array.columns:
-            for b in c.buttons.values():
+            for b in list(c.buttons.values()):
                 b.setFixedSize(self.spacer_width, self.spacer_height)
             # -1 because there is a generic widget in the last spot
             height = sum([c.layout.itemAt(i).widget().height() for i in range(c.layout.count()-1)]) 
@@ -218,7 +221,7 @@ class SequencerControl(QtGui.QWidget):
         da_height = self.digitalControl.array.columns[0].height()
         self.digitalControl.array.setFixedSize(da_width, da_height)
 
-        for nl in self.digitalControl.nameColumn.labels.values():
+        for nl in list(self.digitalControl.nameColumn.labels.values()):
             nl.setFixedHeight(self.spacer_height)
         nc_width = self.namelabel_width
         nc_height = self.digitalControl.array.height()
@@ -234,7 +237,7 @@ class SequencerControl(QtGui.QWidget):
         self.analogControl.vscroll.widget().setFixedSize(0, self.analogControl.array.height())
         self.analogControl.vscroll.setFixedWidth(20)
         
-        for nl in self.analogControl.nameColumn.labels.values():
+        for nl in list(self.analogControl.nameColumn.labels.values()):
             nl.setFixedSize(self.namelabel_width, self.analog_height)
         nc_width = self.namelabel_width
         nc_height = self.analogControl.array.height()
@@ -247,7 +250,7 @@ class SequencerControl(QtGui.QWidget):
         self.electrodeControl.vscroll.widget().setFixedSize(0, self.electrodeControl.array.height())
         self.electrodeControl.vscroll.setFixedWidth(20)
 
-        for nl in self.electrodeControl.nameColumn.labels.values():
+        for nl in list(self.electrodeControl.nameColumn.labels.values()):
             nl.setFixedSize(self.namelabel_width, self.analog_height)
         nc_width = self.namelabel_width
         nc_height = self.electrodeControl.array.height()
@@ -286,19 +289,19 @@ class SequencerControl(QtGui.QWidget):
             b.add.clicked.connect(self.addColumn(i))
             b.dlt.clicked.connect(self.dltColumn(i))
 
-        for l in self.digitalControl.nameColumn.labels.values():
+        for l in list(self.digitalControl.nameColumn.labels.values()):
             l.clicked.connect(self.onDigitalNameClick(l.nameloc))
 
-        for l in self.analogControl.nameColumn.labels.values():
+        for l in list(self.analogControl.nameColumn.labels.values()):
             l.clicked.connect(self.onAnalogNameClick(l.nameloc))
 
-        for l in self.electrodeControl.nameColumn.labels.values():
+        for l in list(self.electrodeControl.nameColumn.labels.values()):
             l.clicked.connect(self.onElectrodeNameClick(l.nameloc))
 
         # KM added below 05/07/18
         # for tracking changes
         for col in self.digitalControl.array.columns:
-            for key, val in col.buttons.items():
+            for key, val in list(col.buttons.items()):
                 val.changed_signal.connect(self.sequenceChanged)
         for b in self.durationRow.boxes:
             b.changed_signal.connect(self.sequenceChanged)
@@ -493,7 +496,7 @@ class SequencerControl(QtGui.QWidget):
         # changed KM 05/07/2018
         seq_time = 0
         # get the total sequence time
-        for k, d in sequence.items():
+        for k, d in list(sequence.items()):
             for step in d:
             	seq_time += step['dt']
             break
@@ -574,7 +577,7 @@ class SequencerControl(QtGui.QWidget):
         if signal:
             sequencer = yield self.cxn.get_server(self.sequencer_servername)
             channels = yield sequencer.get_channels()
-            for l in self.digitalControl.nameColumn.labels.values():
+            for l in list(self.digitalControl.nameColumn.labels.values()):
                 l.displayModeState(json.loads(channels)[l.nameloc])
     
     def getSequence(self):
@@ -586,17 +589,17 @@ class SequencerControl(QtGui.QWidget):
         digital_sequence = {key: [{'dt': dt, 'out': dl[key]} 
                 for dt, dl in zip(durations, digital_logic)]
                 for key in self.digital_channels}
-        analog_sequence = {key: [dict(s.items() + {'dt': dt}.items()) 
+        analog_sequence = {key: [dict(list(s.items()) + list({'dt': dt}.items())) 
                 for s, dt in zip(self.analogControl.sequence[key], durations)]
                 for key in self.analog_channels}
-        electrode_sequence = {key: [dict(s.items() + {'dt': dt}.items()) 
+        electrode_sequence = {key: [dict(list(s.items()) + list({'dt': dt}.items())) 
                 for s, dt in zip(self.electrodeControl.sequence[key], durations)]
                 for key in self.electrode_channels}
 
         # Make sure the durations in metadata['electrodes'] are updated!
         for i, data in enumerate(self.metadata['electrodes']):
             data.update({'dt': durations[i]})
-        sequence = dict(digital_sequence.items() + analog_sequence.items() + electrode_sequence.items())
+        sequence = dict(list(digital_sequence.items()) + list(analog_sequence.items()) + list(electrode_sequence.items()))
         return sequence
     
     def sequenceChanged(self):

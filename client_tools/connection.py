@@ -1,4 +1,5 @@
 from __future__ import print_function
+from builtins import object
 import os
 from twisted.internet.defer import inlineCallbacks, returnValue
 
@@ -73,7 +74,7 @@ class connection(object):
         print('server connected')
         server_name = server_name[1]
         print(server_name)
-        if server_name in self._servers.keys():
+        if server_name in list(self._servers.keys()):
             print('{} Connected'.format(server_name))
             self._servers[server_name] = yield self.cxn[server_name]
             actions = self._on_connect[server_name]
@@ -83,7 +84,7 @@ class connection(object):
     @inlineCallbacks
     def followServerDisconnect(self, cntx, server_name):
         server_name = server_name[1]
-        if server_name in self._servers.keys():
+        if server_name in list(self._servers.keys()):
             print('{} Disconnected'.format(server_name))
             self._servers[server_name] = None
             actions = self._on_disconnect[server_name]

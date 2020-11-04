@@ -1,4 +1,11 @@
 from __future__ import absolute_import
+from __future__ import division
+from builtins import zip
+from builtins import str
+from builtins import hex
+from builtins import range
+from builtins import object
+from past.utils import old_div
 import numpy as np
 import json
 
@@ -16,19 +23,19 @@ def time_to_ticks(clk, time):
 def voltage_to_signed(voltage):
     voltage_span = float(max(VOLTAGE_RANGE) - min(VOLTAGE_RANGE))
     voltage = sorted([-voltage_span, voltage, voltage_span])[1]
-    return int(voltage/voltage_span*(2**DAC_BITS-1))
+    return int(old_div(voltage,voltage_span)*(2**DAC_BITS-1))
 
 def voltage_to_unsigned(voltage):
     min_voltage = min(VOLTAGE_RANGE)
     max_voltage = max(VOLTAGE_RANGE)
     voltage_span = float(max(VOLTAGE_RANGE) - min(VOLTAGE_RANGE))
     voltage = sorted([min_voltage, voltage, max_voltage])[1] - min_voltage
-    return int(voltage/voltage_span*(2**DAC_BITS-1))
+    return int(old_div(voltage,voltage_span)*(2**DAC_BITS-1))
 
 def ramp_rate(voltage_diff, ticks):
     v = voltage_to_signed(voltage_diff)
     t = ticks
-    signed_ramp_rate = int(v*2.**int(np.log2(t)-1)/t)
+    signed_ramp_rate = int(old_div(v*2.**int(np.log2(t)-1),t))
     if signed_ramp_rate > 0:
         return signed_ramp_rate
     else:
@@ -55,7 +62,7 @@ class AnalogChannel(object):
         self.voltage_range = [-10., 10.]
         
         """ non-defaults """
-        for key, value in config.items():
+        for key, value in list(config.items()):
             setattr(self, key, value)
         
         self.loc = self.board_name + str(self.loc).zfill(2)
@@ -91,7 +98,7 @@ class AnalogBoard(DeviceWrapper):
         self.manual_voltage_wires = [0x01, 0x02, 0x03, 0x04, 
                                      0x05, 0x06, 0x07, 0x08]
 
-        self.clk =  48e6 / (8.*2. + 2.)
+        self.clk =  old_div(48e6, (8.*2. + 2.))
 #        self.clk = 12e6 / (8.*4. + 2.)
         self.mode = 'idle'
 
@@ -99,7 +106,7 @@ class AnalogBoard(DeviceWrapper):
                             for i in range(8)]
 
         """ non-defaults"""
-        for key, value in config.items():
+        for key, value in list(config.items()):
             setattr(self, key, value)
         
         for c in self.channels:

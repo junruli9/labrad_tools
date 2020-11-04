@@ -34,8 +34,8 @@ class Client(ConductorParameter):
                     "measurement": "experiment parameters",
                     "tags": {"device": device_name, "parameter": p},
                     "fields": {"value": to_float(v)},
-                } for device_name, device in parameters.items() 
-                  for p, v in device.items()
+                } for device_name, device in list(parameters.items()) 
+                  for p, v in list(device.items())
             ]
         
             callInThread(self.dbclient.write_points, to_db)

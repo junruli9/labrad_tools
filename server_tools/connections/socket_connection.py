@@ -1,3 +1,4 @@
+from builtins import object
 import socket
 
 from twisted.internet.defer import inlineCallbacks, returnValue

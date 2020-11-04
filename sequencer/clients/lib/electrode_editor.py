@@ -1,4 +1,8 @@
 from __future__ import absolute_import
+from builtins import zip
+from builtins import str
+from builtins import range
+from builtins import object
 import sys
 import json
 from PyQt4 import QtGui, QtCore
@@ -126,11 +130,11 @@ class RampColumn(QtGui.QGroupBox):
         # self.add = QtGui.QPushButton('+')
         # self.dlt = QtGui.QPushButton('-')
         self.ramp_select = QtGui.QComboBox()
-        self.ramp_select.addItems(self.ramp_maker.available_ramps.keys())
+        self.ramp_select.addItems(list(self.ramp_maker.available_ramps.keys()))
         self.parameter_widgets = {k: ParameterWidget(k, ramp) for 
-                k, ramp in self.ramp_maker.available_ramps.items()}
+                k, ramp in list(self.ramp_maker.available_ramps.items())}
         self.stack = QtGui.QStackedWidget()
-        for k, pw in self.parameter_widgets.items():
+        for k, pw in list(self.parameter_widgets.items()):
             self.stack.addWidget(pw)
         
         self.zero_button = QtGui.QPushButton('zero')
@@ -179,9 +183,9 @@ class RampColumn(QtGui.QGroupBox):
 
     def updatePresets(self, presets):
         self.presets = presets
-        for p in self.parameter_widgets.values():        
+        for p in list(self.parameter_widgets.values()):        
             ps = p.pboxes
-            for k in ps.keys():
+            for k in list(ps.keys()):
                 if k == 'vi' or k == 'vf':
                     ps[k].updatePresets(self.presets)
 
@@ -189,7 +193,7 @@ class RampColumn(QtGui.QGroupBox):
         ramp_type = str(self.ramp_select.currentText())
         ramp = {'type': str(self.ramp_select.currentText())}
         if ramp['type'] != 'sub':
-            ramp.update({k: b.value() for k, b in self.stack.currentWidget().pboxes.items()})
+            ramp.update({k: b.value() for k, b in list(self.stack.currentWidget().pboxes.items())})
         else:
             ramp.update({'seq': eval('['+str(self.stack.currentWidget().subbox.toPlainText())+']')})
         return ramp
@@ -272,7 +276,7 @@ class ElectrodeEditor(QtGui.QDialog):
         return lookup
 
     def check_electrode_sequence(self, electrode_sequence):
-        dummy = self.sequence.keys()[0]
+        dummy = list(self.sequence.keys())[0]
         dummy_seq = self.sequence[dummy]
 
         if len(electrode_sequence) != len(dummy_seq):
@@ -327,8 +331,8 @@ class ElectrodeEditor(QtGui.QDialog):
         # pyqt signals
         for c in self.ramp_table.cols:
             c.ramp_select.currentIndexChanged.connect(self.replot)
-            for pw in c.parameter_widgets.values():
-                for key, pb in pw.pboxes.items():
+            for pw in list(c.parameter_widgets.values()):
+                for key, pb in list(pw.pboxes.items()):
                     if key == 'vi' or key == 'vf':
                         pb.currentIndexChanged.connect(self.replot)
                     else:
@@ -398,7 +402,7 @@ class ElectrodeEditor(QtGui.QDialog):
             ramp_type = s['type']
             c.ramp_select.setCurrentIndex(c.ramp_select.findText(ramp_type))
         
-            for k in c.parameter_widgets[ramp_type].pboxes.keys():
+            for k in list(c.parameter_widgets[ramp_type].pboxes.keys()):
                 c.parameter_widgets[ramp_type].pboxes[k].display(s[k])
                 
         self.loading = False
@@ -472,13 +476,13 @@ class ElectrodeEditor(QtGui.QDialog):
         sequence = substitute_sequence_parameters(sequence, parameter_values)
 
         fixed_sequence = self.parseElectrodesSequence(sequence)
-        returnValue({key: self.ramp_maker(val).get_plottable() for key, val in fixed_sequence.items()})
+        returnValue({key: self.ramp_maker(val).get_plottable() for key, val in list(fixed_sequence.items())})
     
     def get_sequence(self):
         electrode_sequence = self.ramp_table.get_sequence()
         fixed_sequence = self.parseElectrodesSequence(electrode_sequence)
 
-        for k, v in fixed_sequence.items():
+        for k, v in list(fixed_sequence.items()):
             self.sequence.update({self.lookup[k]: v})
         return self.sequence
 

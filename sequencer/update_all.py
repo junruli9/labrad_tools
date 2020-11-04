@@ -1,6 +1,7 @@
 """ Update all sequences after config.json has been modified. """
 from __future__ import print_function
 
+from builtins import range
 import json
 import glob
 

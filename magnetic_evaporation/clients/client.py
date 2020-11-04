@@ -1,4 +1,9 @@
 from __future__ import print_function
+from __future__ import division
+from builtins import str
+from builtins import range
+from past.utils import old_div
+from builtins import object
 from PyQt4 import QtCore, QtGui
 import json
 #from scratch import evaporation
@@ -268,7 +273,7 @@ def loadtraj(path):
         evap = json.load(infile)
 
     A = {}
-    for key, values in evap.items():
+    for key, values in list(evap.items()):
         A[key] = values
     return A
 
@@ -286,15 +291,15 @@ def exponential(fi,fs,fa,tau):
         raise Exception("Initial and final frequencies must be larger than asymptotic frequency")
     
     if fi > fs:
-        tf = tau*np.log((float(fi)-fa)/(fs-fa))
-        N = int(np.floor(tf/dT))
+        tf = tau*np.log(old_div((float(fi)-fa),(fs-fa)))
+        N = int(np.floor(old_div(tf,dT)))
 
         
         Y = np.zeros(N)
         T = np.zeros(N)
         for k in range(int(N)):
             T[k] = k*dT
-            Y[k] = (fi-fa)*np.exp(-T[k]/tau) + fa
+            Y[k] = (fi-fa)*np.exp(old_div(-T[k],tau)) + fa
         return Y
 
 if __name__ == "__main__":

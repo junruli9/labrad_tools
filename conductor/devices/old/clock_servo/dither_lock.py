@@ -12,9 +12,9 @@ class DitherLock(ConductorParameter):
     def __init__(self, config):
         super(DitherLock, self).__init__(config)
         self.pid = {lock_name: DitherPIID(**lock_conf['pid']) 
-            for lock_name, lock_conf in config.items()}
+            for lock_name, lock_conf in list(config.items())}
         self.dither = {lock_name: Dither(**lock_conf['dither']) 
-            for lock_name, lock_conf in config.items()}
+            for lock_name, lock_conf in list(config.items())}
         self._value = {}
 
     @inlineCallbacks

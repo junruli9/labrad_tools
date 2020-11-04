@@ -1,3 +1,4 @@
+from builtins import range
 import json
 import os
 
@@ -71,7 +72,7 @@ def zero_sequence(dt):
 def combine_sequences(sequence_list):
     combined_sequence = sequence_list.pop(0)
     for sequence in sequence_list:
-        for k in sequence.keys():
+        for k in list(sequence.keys()):
             combined_sequence[k] += sequence[k]
     return combined_sequence
 
@@ -82,7 +83,7 @@ def get_parameters(x):
     elif type(x).__name__ == 'list':
         return list(chain.from_iterable([get_parameters(xx) for xx in x]))
     elif type(x).__name__ == 'dict':
-        return list(chain.from_iterable([get_parameters(v) for v in x.values()]))
+        return list(chain.from_iterable([get_parameters(v) for v in list(x.values())]))
     else:
         return []
 
@@ -95,10 +96,10 @@ def substitute_sequence_parameters(x, parameter_values):
     elif type(x).__name__ == 'list':
         return [substitute_sequence_parameters(xx, parameter_values) for xx in x]
     elif type(x).__name__ == 'dict':
-        return {k: substitute_sequence_parameters(v, parameter_values) for k, v in x.items()}
+        return {k: substitute_sequence_parameters(v, parameter_values) for k, v in list(x.items())}
     else:
         return x
 
 def get_duration(sequence):
-    return max([sum([s['dt'] for s in cs]) for cs in sequence.values()])
+    return max([sum([s['dt'] for s in cs]) for cs in list(sequence.values())])
 

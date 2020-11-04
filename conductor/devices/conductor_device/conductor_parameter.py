@@ -1,3 +1,4 @@
+from builtins import object
 from twisted.internet.defer import inlineCallbacks
 
 class ConductorParameter(object):
@@ -45,7 +46,7 @@ class ConductorParameter(object):
         default behavior is to set (key, value) -> (instance attribute, value)
         """
         self._value = None
-        for key, value in config.items():
+        for key, value in list(config.items()):
             setattr(self, key, value)
 
     @inlineCallbacks

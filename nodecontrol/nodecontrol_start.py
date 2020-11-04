@@ -5,7 +5,7 @@ import time
 from nodecontrol_config import node_dict
 
 cxn = labrad.connect()
-for node in node_dict.keys():
+for node in list(node_dict.keys()):
     if node in cxn.servers: 
         print('{}:'.format(node))
         cxn.servers[node].refresh_servers()

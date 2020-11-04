@@ -1,4 +1,9 @@
 from __future__ import print_function
+from __future__ import division
+from builtins import zip
+from builtins import range
+from builtins import object
+from past.utils import old_div
 import numpy as np
 
 VLIM = 4
@@ -31,7 +36,7 @@ def lin_ramp(p):
     returns continuous finction defined over ['ti', 'tf'].
     values are determined by connecting 'vi' to 'vf' with a line.
     """
-    return lambda t: G(p['ti'], p['tf'])(t)*(p['vi'] + (p['vf']-p['vi'])/(p['tf']-p['ti'])*(t-p['ti']))
+    return lambda t: G(p['ti'], p['tf'])(t)*(p['vi'] + old_div((p['vf']-p['vi']),(p['tf']-p['ti']))*(t-p['ti']))
 
 def exp_ramp(p, ret_seq=False):
     """
@@ -40,13 +45,13 @@ def exp_ramp(p, ret_seq=False):
     v = a*e^{-t/'tau'} + c
     """
     try:
-        p['a'] = (p['vf']-p['vi'])/(np.exp(p['dt']/p['tau'])-1)
+        p['a'] = old_div((p['vf']-p['vi']),(np.exp(old_div(p['dt'],p['tau']))-1))
     except Exception as e:
         print(e)
         sseq = [{'type': 'lin', 'ti': p['ti'], 'tf': p['tf'], 'vi': p['vi'], 'vf': p['vf']}]
         return lambda t: sum([lin_ramp(ss)(t) for ss in sseq])
     p['c'] = p['vi'] - p['a']
-    v_ideal = lambda t: G(p['ti'], p['tf'])(t)*(p['a']*np.exp((t-p['ti'])/p['tau']) + p['c'])
+    v_ideal = lambda t: G(p['ti'], p['tf'])(t)*(p['a']*np.exp(old_div((t-p['ti']),p['tau'])) + p['c'])
     t_pts = np.linspace(p['ti'], p['tf']-2e-9, p['pts']+1)
     v_pts = v_ideal(t_pts)
     sseq = [{'type': 'lin', 'ti': ti, 'tf': tf, 'vi': vi, 'vf': vf} 
@@ -71,9 +76,9 @@ def scurve_ramp(p, ret_seq=False):
 
     t0 = (p['ti'] + p['tf']) / 2.0
     pdiff = (p['tf'] - p['ti'])
-    steep = 12 * p['steep'] / pdiff # normalized, unitless
+    steep = old_div(12 * p['steep'], pdiff) # normalized, unitless
 
-    v_ideal = lambda t: G(p['ti'], p['tf'])(t) * (p['a'] / (1 + np.exp(- (t - t0) * steep)) + p['c'])
+    v_ideal = lambda t: G(p['ti'], p['tf'])(t) * (old_div(p['a'], (1 + np.exp(- (t - t0) * steep))) + p['c'])
     t_pts = np.linspace(p['ti'], p['tf']-2e-9, p['pts']+1)
     v_pts = v_ideal(t_pts)
     sseq = [{'type': 'lin', 'ti': ti, 'tf': tf, 'vi': vi, 'vf': vf} 
@@ -243,7 +248,7 @@ class RampMaker(object):
         if scale=='real':
             return T, V
         elif scale=='step':
-            T = range(len(V))
+            T = list(range(len(V)))
             return T, V
 
     def get_continuous(self):

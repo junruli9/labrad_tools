@@ -1,4 +1,6 @@
 from __future__ import absolute_import
+from builtins import str
+from builtins import range
 import json
 import time
 import numpy as np
@@ -170,7 +172,7 @@ class IndependentControl(ControlForm):
 	def convertAndPopulate(self, NormalModes):
 		Vs = NormalModesToVs(NormalModes)
 
-		for key, val in Vs.items():
+		for key, val in list(Vs.items()):
 			index = self.lookup[key]
 			self.edits[index].setValue(val)
 	
@@ -211,7 +213,7 @@ class NormalControl(ControlForm):
 	def convertAndPopulate(self, Vs):
 		NormalModes = VsToNormalModes(Vs, self.comp_shim)
 
-		for key, val in NormalModes.items():
+		for key, val in list(NormalModes.items()):
 			index = self.lookup[key]
 			self.edits[index].setValue(val)
 

@@ -1,3 +1,8 @@
+from __future__ import division
+from builtins import zip
+from builtins import range
+from builtins import object
+from past.utils import old_div
 import numpy as np
 
 def H(x):
@@ -25,7 +30,7 @@ def lin_ramp(p):
     returns continuous finction defined over ['ti', 'tf'].
     values are determined by connecting 'vi' to 'vf' with a line.
     """
-    return lambda t: G(p['ti'], p['tf'])(t)*(p['vi'] + (p['vf']-p['vi'])/(p['tf']-p['ti'])*(t-p['ti']))
+    return lambda t: G(p['ti'], p['tf'])(t)*(p['vi'] + old_div((p['vf']-p['vi']),(p['tf']-p['ti']))*(t-p['ti']))
 
 def exp_ramp(p, ret_seq=False):
     """
@@ -33,9 +38,9 @@ def exp_ramp(p, ret_seq=False):
     values are determined by connecting 'vi' to 'vf' with an exponential function.
     v = a*e^{-t/'tau'} + c
     """
-    p['a'] = (p['vf']-p['vi'])/(np.exp(p['dt']/p['tau'])-1)
+    p['a'] = old_div((p['vf']-p['vi']),(np.exp(old_div(p['dt'],p['tau']))-1))
     p['c'] = p['vi'] - p['a']
-    v_ideal = lambda t: G(p['ti'], p['tf'])(t)*(p['a']*np.exp((t-p['ti'])/p['tau']) + p['c'])
+    v_ideal = lambda t: G(p['ti'], p['tf'])(t)*(p['a']*np.exp(old_div((t-p['ti']),p['tau'])) + p['c'])
     t_pts = np.linspace(p['ti'], p['tf']-2e-9, p['pts']+1)
     v_pts = v_ideal(t_pts)
     sseq = [{'type': 'lin', 'ti': ti, 'tf': tf, 'vi': vi, 'vf': vf} 
@@ -68,9 +73,9 @@ def scurve_ramp(p, ret_seq=False):
 
     # normalize away the dependence of the shape on dt
     # multiply by 12 so that "nice-looking" s-curves have steepness O(1)
-    steep = 12.0 * p['k'] / dt
+    steep = old_div(12.0 * p['k'], dt)
 
-    v_ideal = lambda t: G(p['ti'], p['tf'])(t) * (p['c'] + p['a'] / (1 + np.exp(-(t-t0)*steep)) )
+    v_ideal = lambda t: G(p['ti'], p['tf'])(t) * (p['c'] + old_div(p['a'], (1 + np.exp(-(t-t0)*steep))) )
     t_pts = np.linspace(p['ti'], p['tf']-2e-9, p['pts']+1)
     v_pts = v_ideal(t_pts)
     sseq = [{'type': 'lin', 'ti': ti, 'tf': tf, 'vi': vi, 'vf': vf} 
@@ -260,7 +265,7 @@ class RampMaker(object):
         if scale=='real':
             return T, V
         elif scale=='step':
-            T = range(len(V))
+            T = list(range(len(V)))
             return T, V
 
     def get_continuous(self):

@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import range
 from PyQt4 import QtGui, QtCore, Qt
 from PyQt4.QtCore import pyqtSignal 
 import numpy as np
@@ -67,7 +69,7 @@ class DigitalColumn(QtGui.QWidget):
         self.buttons = {nl: SequencerButton() for nl in self.channels}
 
         # added KM 1/23/19
-        for (nl, b) in self.buttons.items():
+        for (nl, b) in list(self.buttons.items()):
             b.name = nl
             b.clicked_signal.connect(self.handle_click)
 
@@ -170,8 +172,8 @@ class DigitalArray(QtGui.QWidget):
             
             # generate array of indices so we can grab every sequencer button
             # between the two that were clicked
-            channel_index = range(min(last_index,current_index), max(last_index,current_index)+1)
-            col_index = range(min(last_position, position), max(last_position, position) + 1)
+            channel_index = list(range(min(last_index,current_index), max(last_index,current_index)+1))
+            col_index = list(range(min(last_position, position), max(last_position, position) + 1))
 
             # flip the state of the two buttons that were most recently clicked
             # this is required to get a fair polling in the limit of few buttons being selected

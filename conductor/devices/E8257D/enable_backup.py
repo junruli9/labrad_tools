@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import range
 import sys
 sys.path.append('../')
 from generic_device.generic_parameter import GenericParameter
@@ -85,8 +87,8 @@ class Enable(ConductorParameter):
                                 # this check is very important! otherwise everything will break when
                                 # the defaults are run at the end of the experiment
                                 if type(loc) is not int:
-                                    if unicode(self.state) in loc:
-                                        params = loc[unicode(self.state)]
+                                    if str(self.state) in loc:
+                                        params = loc[str(self.state)]
                                         if u'frequency' in params:
                                             to_run['f'] = params[u'frequency']
                                         if u'amplitude' in params:                   

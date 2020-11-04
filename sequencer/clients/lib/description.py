@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import range
 import sys
 import json
 from PyQt4 import QtGui, QtCore
@@ -24,7 +26,7 @@ class DescriptionDialog(QtGui.QDialog):
 
         # Get a random channel of the sequence
         # This is a list of dicts, each dict corresponding to a timestep
-        val = self.sequence.values()[0]
+        val = list(self.sequence.values())[0]
 
         # If the number of descriptions is not correct,
         # just clear them all

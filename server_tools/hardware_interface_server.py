@@ -31,9 +31,9 @@ class HardwareInterfaceServer(LabradServer):
     def get_interface(self, c):
         if 'address' not in c:
             raise Exception('no interface selected')
-        if c['address'] not in self.interfaces.keys():
+        if c['address'] not in list(self.interfaces.keys()):
             self.refresh_available_interfaces()
-            if c['address'] not in self.interfaces.keys():
+            if c['address'] not in list(self.interfaces.keys()):
                 raise Exception(c['address'] + 'is unavailable')
         return self.interfaces[c['address']]
 

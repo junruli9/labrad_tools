@@ -1,3 +1,4 @@
+from builtins import object
 from twisted.internet.defer import inlineCallbacks, returnValue
 from twisted.internet.threads import deferToThread
 from vxi11 import Instrument
